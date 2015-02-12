@@ -127,7 +127,7 @@ def unmakeProperties(obj):
         delFunc = delattr
         d = obj.__dict__
 
-    for var, value in d.items():
+    for var, value in d.copy().items():
         if isinstance(value, property):
             for prop in [value.fget, value.fset, value.fdel]:
                 if prop and prop.__name__ not in d:
@@ -902,7 +902,7 @@ class SQLObject(object):
                     "(while fixing up sqlmeta %r inheritance)"
                     % cls.sqlmeta)
             values = dict(cls.sqlmeta.__dict__)
-            for key in values.keys():
+            for key in values.copy().keys():
                 if key.startswith('__') and key.endswith('__'):
                     # Magic values shouldn't be passed through:
                     del values[key]
@@ -1206,7 +1206,7 @@ class SQLObject(object):
                     raise AttributeError('%s (with attribute %r)' % (e, name))
 
             if toUpdate:
-                toUpdate = toUpdate.items()
+                toUpdate = list(toUpdate.items())
                 toUpdate.sort(
                     key=lambda c: self.sqlmeta.columns[c[0]].creationOrder)
                 args = [(self.sqlmeta.columns[name].dbName, value)
@@ -1354,7 +1354,7 @@ class SQLObject(object):
         # Here's where an INSERT is finalized.
         # These are all the column values that were supposed
         # to be set, but were delayed until now:
-        setters = self._SO_createValues.items()
+        setters = list(self._SO_createValues.items())
         setters.sort(key=lambda c: self.sqlmeta.columns[c[0]].creationOrder)
         # Here's their database names:
         names = [self.sqlmeta.columns[v[0]].dbName for v in setters]
