@@ -561,15 +561,15 @@ class StringValidator(SOValidator):
         except AttributeError:
             binaryType = type(None)  # Just a simple workaround
         dbEncoding = self.getDbEncoding(state, default='ascii')
-        if isinstance(value, unicode):
-            return value.encode(dbEncoding)
+        if isinstance(value, str):
+            return value
         if self.dataType and isinstance(value, self.dataType):
             return value
         if isinstance(value,
-                      (str, buffer, binaryType, sqlbuilder.SQLExpression)):
+                      (bytes, memoryview, binaryType, sqlbuilder.SQLExpression)):
             return value
         if hasattr(value, '__unicode__'):
-            return unicode(value).encode(dbEncoding)
+            return str(value).encode(dbEncoding)
         raise validators.Invalid(
             "expected a str in the StringCol '%s', got %s %r instead" % (
                 self.name, type(value), value), value, state)
@@ -590,7 +590,7 @@ class StringCol(Col):
 
 class NQuoted(sqlbuilder.SQLExpression):
     def __init__(self, value):
-        assert isinstance(value, unicode)
+        assert isinstance(value, str)
         self.value = value
 
     def __hash__(self):
@@ -606,14 +606,14 @@ class UnicodeStringValidator(SOValidator):
     def to_python(self, value, state):
         if value is None:
             return None
-        if isinstance(value, (unicode, sqlbuilder.SQLExpression)):
+        if isinstance(value, (str, sqlbuilder.SQLExpression)):
             return value
         if isinstance(value, str):
-            return unicode(value, self.getDbEncoding(state))
+            return str(value, self.getDbEncoding(state))
         if isinstance(value, array):  # MySQL
-            return unicode(value.tostring(), self.getDbEncoding(state))
+            return str(value.tostring(), self.getDbEncoding(state))
         if hasattr(value, '__unicode__'):
-            return unicode(value)
+            return str(value)
         raise validators.Invalid(
             "expected a str or a unicode in the UnicodeCol '%s', "
             "got %s %r instead" % (
@@ -624,7 +624,7 @@ class UnicodeStringValidator(SOValidator):
             return None
         if isinstance(value, (str, sqlbuilder.SQLExpression)):
             return value
-        if isinstance(value, unicode):
+        if isinstance(value, str):
             try:
                 connection = state.connection or state.soObject._connection
             except AttributeError:
@@ -634,7 +634,7 @@ class UnicodeStringValidator(SOValidator):
                     return NQuoted(value)
             return value.encode(self.getDbEncoding(state))
         if hasattr(value, '__unicode__'):
-            return unicode(value).encode(self.getDbEncoding(state))
+            return str(value).encode(self.getDbEncoding(state))
         raise validators.Invalid(
             "expected a str or a unicode in the UnicodeCol '%s', "
             "got %s %r instead" % (
@@ -1027,7 +1027,7 @@ class EnumValidator(SOValidator):
 
     def to_python(self, value, state):
         if value in self.enumValues:
-            if isinstance(value, unicode):
+            if isinstance(value, str):
                 dbEncoding = self.getDbEncoding(state)
                 value = value.encode(dbEncoding)
             return value
@@ -1120,7 +1120,7 @@ class SetValidator(SOValidator):
                 self.name, type(value), value), value, state)
 
     def from_python(self, value, state):
-        if isinstance(value, basestring):
+        if isinstance(value, str):
             value = (value,)
         try:
             return ",".join(value)
@@ -1534,7 +1534,7 @@ class DecimalValidator(SOValidator):
             return None
         if isinstance(value, float):
             value = str(value)
-        if isinstance(value, basestring):
+        if isinstance(value, str):
             try:
                 connection = state.connection or state.soObject._connection
             except AttributeError:
@@ -1665,17 +1665,17 @@ class BinaryValidator(SOValidator):
         else:
             dbName = connection.dbName
             binaryType = connection._binaryType
-        if isinstance(value, str):
+        if isinstance(value, bytes):
             if dbName == "sqlite":
                 value = connection.module.decode(value)
             return value
-        if isinstance(value, (buffer, binaryType)):
+        if isinstance(value, (memoryview, binaryType)):
             cachedValue = self._cachedValue
             if cachedValue and cachedValue[1] == value:
                 return cachedValue[0]
             if isinstance(value, array):  # MySQL
                 return value.tostring()
-            return str(value)  # buffer => string
+            return value.tostring()  # buffer => string
         raise validators.Invalid(
             "expected a string in the BLOBCol '%s', got %s %r instead" % (
                 self.name, type(value), value), value, state)
@@ -1739,7 +1739,7 @@ class PickleValidator(BinaryValidator):
     def to_python(self, value, state):
         if value is None:
             return None
-        if isinstance(value, unicode):
+        if isinstance(value, str):
             dbEncoding = self.getDbEncoding(state, default='ascii')
             value = value.encode(dbEncoding)
         if isinstance(value, str):

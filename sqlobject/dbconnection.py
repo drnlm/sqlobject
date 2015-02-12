@@ -618,7 +618,7 @@ class DBAPI(DBConnection):
 
     def _SO_selectOneAlt(self, so, columnNames, condition):
         if columnNames:
-            columns = [isinstance(x, basestring) and sqlbuilder.SQLConstant(x)
+            columns = [isinstance(x, str) and sqlbuilder.SQLConstant(x)
                        or x for x in columnNames]
         else:
             columns = None

@@ -91,7 +91,7 @@ safeSQLRE = re.compile(r'^[a-zA-Z_][a-zA-Z0-9_\.]*$')
 
 def sqlIdentifier(obj):
     # some db drivers return unicode column names
-    return isinstance(obj, basestring) and bool(safeSQLRE.search(obj.strip()))
+    return isinstance(obj, str) and bool(safeSQLRE.search(obj.strip()))
 
 
 def execute(expr, executor):
@@ -102,7 +102,7 @@ def execute(expr, executor):
 
 
 def _str_or_sqlrepr(expr, db):
-    if isinstance(expr, basestring):
+    if isinstance(expr, str):
         return expr
     return sqlrepr(expr, db)
 
@@ -721,7 +721,7 @@ class Select(SQLExpression):
             # None doesn't filter anything, it's just a no-op:
             return self
         clause = self.ops['clause']
-        if isinstance(clause, basestring):
+        if isinstance(clause, str):
             clause = SQLConstant('(%s)' % clause)
         return self.newClause(AND(clause, filter_clause))
 
@@ -1026,7 +1026,7 @@ def ISNOTNULL(expr):
 class ColumnAS(SQLOp):
     ''' Just like SQLOp('AS', expr, name) except without the parentheses '''
     def __init__(self, expr, name):
-        if isinstance(name, basestring):
+        if isinstance(name, str):
             name = SQLConstant(name)
         SQLOp.__init__(self, 'AS', expr, name)
 
@@ -1068,7 +1068,7 @@ class _LikeQuoted:
                 return "CONCAT(%s)" % ", ".join(values)
             else:
                 return " || ".join(values)
-        elif isinstance(s, basestring):
+        elif isinstance(s, str):
             s = _quote_like_special(unquote_str(sqlrepr(s, db)), db)
             return quote_str("%s%s%s" % (self.prefix, s, self.postfix), db)
         else:

@@ -478,7 +478,7 @@ class sqlmeta(object):
         conn = connection or soClass._connection
         for columnDef in conn.columnsFromSchema(sqlmeta.table, soClass):
             if columnDef.name not in sqlmeta.columnDefinitions:
-                if isinstance(columnDef.name, unicode):
+                if isinstance(columnDef.name, str):
                     columnDef.name = columnDef.name.encode('ascii')
                 sqlmeta.addColumn(columnDef)
 
@@ -1734,7 +1734,7 @@ class SQLObject(object):
 
     @classmethod
     def setConnection(cls, value):
-        if isinstance(value, basestring):
+        if isinstance(value, str):
             value = dbconnection.connectionForURI(value)
         cls._connection = value
 

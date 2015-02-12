@@ -78,7 +78,9 @@ def StringLikeConverter(value, db):
             value = value.tounicode()
         except ValueError:
             value = value.tostring()
-    elif isinstance(value, buffer):
+    elif isinstance(value, bytes):
+        value = value.decode()
+    elif isinstance(value, memoryview):
         value = str(value)
 
     if db in ('mysql', 'postgres', 'rdbhost'):
@@ -100,6 +102,7 @@ if sys.version_info[0] < 3:
     registerConverter(buffer, StringLikeConverter)
 else:
     registerConverter(memoryview, StringLikeConverter)
+    registerConverter(bytes, StringLikeConverter)
 
 
 def IntConverter(value, db):
