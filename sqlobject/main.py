@@ -1423,7 +1423,7 @@ class SQLObject(object):
                         cls.__name__, name, repr(value)))
             else:
                 names = []
-                for i in xrange(len(name)):
+                for i in range(len(name)):
                     names.append("%s = %s" % (name[i], repr(value[i])))
                 names = ', '.join(names)
                 raise SQLObjectNotFound(
