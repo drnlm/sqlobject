@@ -90,7 +90,10 @@ class DeclarativeMeta(type):
         for func in early_funcs:
             func(cls)
         if '__classinit__' in new_attrs:
-            cls.__classinit__ = staticmethod(cls.__classinit__.im_func)
+            if hasattr(cls.__classinit__, 'im_func'):
+                cls.__classinit__ = staticmethod(cls.__classinit__.im_func)
+            else:
+                cls.__classinit__ = staticmethod(cls.__classinit__)
         cls.__classinit__(cls, new_attrs)
         for func in post_funcs:
             func(cls)
