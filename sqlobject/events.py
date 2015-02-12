@@ -328,7 +328,7 @@ def nice_repr(v):
     """
     Like repr(), but nicer for debugging here.
     """
-    if isinstance(v, (types.ClassType, type)):
+    if isinstance(v, (type,)):
         return v.__module__ + '.' + v.__name__
     elif isinstance(v, types.FunctionType):
         if '__name__' in v.__globals__:
