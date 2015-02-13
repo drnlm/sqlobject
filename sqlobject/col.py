@@ -614,6 +614,8 @@ class UnicodeStringValidator(SOValidator):
             return str(value, self.getDbEncoding(state))
         if isinstance(value, array):  # MySQL
             return str(value.tostring(), self.getDbEncoding(state))
+        if isinstance(value, bytes):
+            return str(value, self.getDbEncoding(state))
         if hasattr(value, '__unicode__'):
             return str(value)
         raise validators.Invalid(

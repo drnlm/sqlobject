@@ -52,6 +52,9 @@ class SOValidationTestUnicode(SOValidationTest):
     def __unicode__(self):
         return self.value
 
+    def __str__(self):
+        return self.value
+
 
 class SOValidationTestInt(SOValidationTest):
     def __int__(self):
