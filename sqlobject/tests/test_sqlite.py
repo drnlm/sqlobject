@@ -79,7 +79,7 @@ def test_sqlite_aggregate():
                     self.acc = []
 
                 def step(self, value):
-                    if isinstance(value, basestring):
+                    if isinstance(value, str):
                         self.acc.append(value)
                     else:
                         self.acc.append(str(value))
