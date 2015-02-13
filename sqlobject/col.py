@@ -1670,11 +1670,12 @@ class BinaryValidator(SOValidator):
         if isinstance(value, bytes):
             if dbName == "sqlite":
                 value = connection.module.decode(value)
-            return value
+            return value.decode('utf8')
         if isinstance(value, str):
             if dbName == "sqlite":
-                value = connection.module.decode(value.encode('ascii'))
-            return value
+                dbEncoding = self.getDbEncoding(state, default='ascii')
+                value = connection.module.decode(value.encode(dbEncoding))
+            return value.decode('utf8', errors='surrogateescape')
         if isinstance(value, (memoryview, binaryType)):
             cachedValue = self._cachedValue
             if cachedValue and cachedValue[1] == value:
@@ -1690,6 +1691,9 @@ class BinaryValidator(SOValidator):
         if value is None:
             return None
         connection = state.connection or state.soObject._connection
+        if isinstance(value, str):
+            dbEncoding = self.getDbEncoding(state, default='utf8')
+            value = value.encode(dbEncoding)
         binary = connection.createBinary(value)
         self._cachedValue = (value, binary)
         return binary
@@ -1746,8 +1750,8 @@ class PickleValidator(BinaryValidator):
         if value is None:
             return None
         if isinstance(value, str):
-            dbEncoding = self.getDbEncoding(state, default='ascii')
-            value = value.encode(dbEncoding)
+            dbEncoding = self.getDbEncoding(state, default='utf8')
+            value = value.encode(dbEncoding, errors='surrogateescape')
         if isinstance(value, bytes):
             return pickle.loads(value)
         raise validators.Invalid(
