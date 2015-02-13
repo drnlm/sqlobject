@@ -1031,7 +1031,7 @@ class EnumValidator(SOValidator):
 
     def to_python(self, value, state):
         if value in self.enumValues:
-            if isinstance(value, str):
+            if isinstance(value, bytes):
                 dbEncoding = self.getDbEncoding(state)
                 value = value.encode(dbEncoding)
             return value
