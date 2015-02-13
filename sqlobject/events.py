@@ -338,8 +338,8 @@ def nice_repr(v):
         return repr(v)
     elif isinstance(v, types.MethodType):
         return '%s.%s of %s' % (
-            nice_repr(v.im_class), v.im_func.__name__,
-            nice_repr(v.im_self))
+            nice_repr(v.__self__.__class__), v.__func__.__name__,
+            nice_repr(v.__self__))
     else:
         return repr(v)
 
