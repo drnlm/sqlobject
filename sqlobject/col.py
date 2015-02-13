@@ -565,8 +565,10 @@ class StringValidator(SOValidator):
             return value
         if self.dataType and isinstance(value, self.dataType):
             return value
+        if isinstance(value, memoryview):
+            return value.tobytes().decode(dbEncoding)
         if isinstance(value,
-                      (bytes, memoryview, binaryType, sqlbuilder.SQLExpression)):
+                      (bytes, binaryType, sqlbuilder.SQLExpression)):
             return value
         if hasattr(value, '__unicode__'):
             return str(value).encode(dbEncoding)
@@ -1669,6 +1671,10 @@ class BinaryValidator(SOValidator):
             if dbName == "sqlite":
                 value = connection.module.decode(value)
             return value
+        if isinstance(value, str):
+            if dbName == "sqlite":
+                value = connection.module.decode(value.encode('ascii'))
+            return value
         if isinstance(value, (memoryview, binaryType)):
             cachedValue = self._cachedValue
             if cachedValue and cachedValue[1] == value:
@@ -1742,7 +1748,7 @@ class PickleValidator(BinaryValidator):
         if isinstance(value, str):
             dbEncoding = self.getDbEncoding(state, default='ascii')
             value = value.encode(dbEncoding)
-        if isinstance(value, str):
+        if isinstance(value, bytes):
             return pickle.loads(value)
         raise validators.Invalid(
             "expected a pickle string in the PickleCol '%s', "
