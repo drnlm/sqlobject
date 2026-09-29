@@ -14,6 +14,8 @@ jobs:
         exclude:
         - os: windows-latest
           python-version: "2.7"
+        - os: windows-latest
+          python-version: "3.15.0-rc.2"
         include:
         - os: ubuntu-latest
           os-name: Linux
@@ -96,10 +98,14 @@ jobs:
         shell: bash -el {0}
       - name: Run tox @ Linux
         run: |
-          devscripts/tox-select-envs $PYVER-mysql &&
-          devscripts/tox-select-envs $PYVER-postgres &&
-          devscripts/tox-select-envs $PYVER-sqlite &&
-          devscripts/tox-select-envs $PYVER-flake8
+          if [ "$PYVER" == "3.15" ]; then
+              devscripts/tox-select-envs $PYVER-sqlite
+          else
+              devscripts/tox-select-envs $PYVER-mysql &&
+              devscripts/tox-select-envs $PYVER-postgres &&
+              devscripts/tox-select-envs $PYVER-sqlite &&
+              devscripts/tox-select-envs $PYVER-flake8
+          fi
         if: ${{ runner.os == 'Linux' }}
         shell: bash -el {0}
       - name: Run tox @ w32
