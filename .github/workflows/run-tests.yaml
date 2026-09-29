@@ -5,7 +5,7 @@ on: [push, pull_request]
 jobs:
   run-tests:
     env:
-      not_in_conda: "[3.15, 3.15t]"
+      not_in_conda: "['3.15', '3.15t']"
 
     strategy:
       matrix:
