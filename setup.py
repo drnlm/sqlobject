@@ -143,7 +143,7 @@ and `GitHub <https://github.com/sqlobject>`_.
             ['pymysql < 1.0'],
         'pymysql:python_version == "3.4"': ['pymysql < 0.10.0'],
         'pymysql:python_version == "3.6"': ['pymysql < 1.0.3'],
-        'pymysql:python_version >= "3.7"': ['pymysql'],
+        'pymysql:python_version >= "3.7"': ['pymysql < 1.2.0'],
         'mariadb': ['mariadb'],
         # ODBC
         'odbc': ['pyodbc'],
