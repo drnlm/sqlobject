@@ -98,7 +98,7 @@ jobs:
         shell: bash -el {0}
       - name: Run tox @ Linux
         run: |
-          if [ "$PYVER" == "3.15" ]; then
+          if [ "$PYVER" == "315" ]; then
               devscripts/tox-select-envs $PYVER-sqlite
           else
               devscripts/tox-select-envs $PYVER-mysql &&
